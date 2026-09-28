@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Cámara de calorías — SportsInfo{% endblock %}
+{% block content %}
+    <div class="section-head">
+        <div>
+            <h2>Cámara de calorías <span class="soon">Beta</span></h2>
+            <p>Sube una foto de tu comida y obtén una estimación de calorías y macronutrientes.</p>
+        </div>
+    </div>
+
+    <div class="panel-block">
+        <form method="post" enctype="multipart/form-data">
+            <label class="upload-zone" for="photoInput" style="display:block;">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14M4 8h.01M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>
+                <div style="font-weight:600;">Toca para subir una foto de tu comida</div>
+                <div style="color:var(--ink-dim);font-size:0.82rem;margin-top:4px;">JPG o PNG</div>
+            </label>
+            <input type="file" id="photoInput" name="photo" accept="image/*" style="display:none" onchange="this.form.querySelector('button[type=submit]').click()">
+            <button type="submit" style="display:none;">Analizar</button>
+        </form>
+
+        {% if preview_data_url %}
+            <div class="preview-wrap">
+                <img src="{{ preview_data_url }}" alt="Foto analizada">
+            </div>
+        {% endif %}
+
+        {% if result %}
+            <div class="calorie-result">
+                <div class="calorie-big">{{ result.kcal }}<span>kcal estimadas</span></div>
+                <div class="stat-grid">
+                    <div class="stat-box"><div class="lbl">Proteína</div><div class="val">{{ result.protein }} g</div></div>
+                    <div class="stat-box"><div class="lbl">Carbohidratos</div><div class="val">{{ result.carbs }} g</div></div>
+                    <div class="stat-box"><div class="lbl">Grasas</div><div class="val">{{ result.fat }} g</div></div>
+                    <div class="stat-box"><div class="lbl">Método</div><div class="val">Heurístico</div></div>
+                </div>
+                <div class="chart-box" style="height:200px;"><canvas id="macroChart"></canvas></div>
+            </div>
+            <script>
+                new Chart(document.getElementById('macroChart'), {
+                    type: 'doughnut',
+                    data: { labels: ['Proteína','Carbohidratos','Grasas'],
+                        datasets: [{ data: [{{ result.protein }}, {{ result.carbs }}, {{ result.fat }}], backgroundColor:['#5eb3ff','#ffbe3d','#4fd48c'], borderColor:'#0f1e35', borderWidth:2 }] },
+                    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#eef3fb'}}} }
+                });
+            </script>
+        {% endif %}
+
+        <div class="note"><b>Cómo funciona esta versión:</b> todavía no reconoce la comida de tu foto — usa una heurística simple basada en los colores de la imagen (sin IA de visión) para generar un ejemplo de cómo se vería el resultado. Ya queda el lugar marcado en el código (<span class="mono">app.py</span>) para conectar un modelo de IA de reconocimiento de alimentos cuando decidan sumarlo.</div>
+    </div>
+{% endblock %}

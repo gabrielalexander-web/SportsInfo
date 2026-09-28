@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mi historial — SportsInfo{% endblock %}
+{% block content %}
+    <a href="{{ url_for('entrenamiento') }}" class="back-link">← Volver a entrenamiento</a>
+    <div class="section-head"><div><h2>Tu historial</h2><p>Cada vez que generas una rutina, queda guardada aquí.</p></div></div>
+
+    {% if logs %}
+        <div class="panel-block">
+            <table class="routine-table">
+                <thead><tr><th>Fecha</th><th>Deporte</th><th>Peso</th><th>IMC</th><th>Min./día</th></tr></thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.created_at[:10] if log.created_at else '—' }}</td>
+                            <td>{{ log.sports.name if log.sports else '—' }}</td>
+                            <td class="mono">{{ log.weight }} kg</td>
+                            <td class="mono">{{ log.imc }}</td>
+                            <td class="mono">{{ log.daily_minutes or '—' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="chart-box"><canvas id="weightChart"></canvas></div>
+        </div>
+        <script>
+            new Chart(document.getElementById('weightChart'), {
+                type: 'line',
+                data: {
+                    labels: {{ logs | map(attribute='created_at') | list | tojson }},
+                    datasets: [{ label:'Peso (kg)', data: {{ logs | map(attribute='weight') | list | tojson }}, borderColor:'#4fd48c', backgroundColor:'rgba(79,212,140,0.15)', tension:0.3, fill:true }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins:{legend:{labels:{color:'#eef3fb'}}},
+                    scales:{ x:{ticks:{color:'#9fb0cc'},grid:{color:'#26385c'}}, y:{ticks:{color:'#9fb0cc'},grid:{color:'#26385c'}} } }
+            });
+        </script>
+    {% else %}
+        <div class="empty">
+            <p>Todavía no generaste ninguna rutina.</p>
+            <a href="{{ url_for('entrenamiento') }}" class="btn btn-amber">Generar mi primera rutina</a>
+        </div>
+    {% endif %}
+{% endblock %}

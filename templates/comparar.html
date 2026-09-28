@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Comparar deportes — SportsInfo{% endblock %}
+{% block content %}
+    <div class="section-head">
+        <div class="section-head-title">
+            <div class="section-icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l-3 6a3 3 0 006 0zM19 7l-3 6a3 3 0 006 0zM5 7h14"/></svg></div>
+            <div><h2>Comparar deportes</h2>
+            <p>Elige dos deportes y compara costo, equipamiento, tiempo, dificultad, beneficios físicos y apoyo/remuneración estimada.</p>
+        </div>
+        </div>
+    </div>
+
+    <form method="get" class="filters">
+        <select name="d1">
+            <option value="">Deporte 1...</option>
+            {% for s in sports %}<option value="{{ s.id }}" {% if sport1 and sport1.id==s.id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+        </select>
+        <select name="d2">
+            <option value="">Deporte 2...</option>
+            {% for s in sports %}<option value="{{ s.id }}" {% if sport2 and sport2.id==s.id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-amber">Comparar</button>
+    </form>
+
+    {% if sport1 and sport2 %}
+        <div class="grid-2" style="margin-top:24px;">
+            {% for s in [sport1, sport2] %}
+                <div class="panel-block">
+                    <div class="panel-cat">{{ s.category }} · {{ s.gender or 'Mixto' }}</div>
+                    <h3 style="font-size:1.3rem;text-transform:none;letter-spacing:0;">{{ s.name }}</h3>
+                    <div class="stat-grid">
+                        <div class="stat-box"><div class="lbl">Costo</div><div class="val">{{ s.average_cost or '—' }}</div></div>
+                        <div class="stat-box"><div class="lbl">Tiempo</div><div class="val">{{ s.time_commitment or '—' }}</div></div>
+                        <div class="stat-box"><div class="lbl">Dificultad</div><div class="val">{{ s.difficulty_level or '—' }}</div></div>
+                    </div>
+                    <div class="info-block"><h4>Equipamiento requerido</h4><p>{{ s.equipment_required or 'No especificado.' }}</p></div>
+                    <div class="info-block"><h4>Beneficios físicos</h4><p>{{ s.physical_benefits or 'No especificado.' }}</p></div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="panel-block" style="margin-top:16px;">
+            <h3 style="font-size:1.05rem;text-transform:none;letter-spacing:0;margin-bottom:10px;">Comparación (escala 1-5)</h3>
+            <div class="chart-box" style="height:260px;"><canvas id="compareChart"></canvas></div>
+            <div class="info-block">
+                <h4>En resumen</h4>
+                <p>
+                    {% if sport1.cost_score > sport2.cost_score %}{{ sport1.name }} suele costar más que {{ sport2.name }}.
+                    {% elif sport2.cost_score > sport1.cost_score %}{{ sport2.name }} suele costar más que {{ sport1.name }}.
+                    {% else %}Ambos tienen un costo similar. {% endif %}
+                    {% if sport1.time_score > sport2.time_score %}{{ sport1.name }} exige más tiempo de dedicación.
+                    {% elif sport2.time_score > sport1.time_score %}{{ sport2.name }} exige más tiempo de dedicación.
+                    {% else %}Ambos exigen un tiempo similar. {% endif %}
+                    {% if sport1.funding_score > sport2.funding_score %}{{ sport1.name }} tiende a tener más apoyo o remuneración.
+                    {% elif sport2.funding_score > sport1.funding_score %}{{ sport2.name }} tiende a tener más apoyo o remuneración.
+                    {% else %}Ambos tienen un nivel de apoyo similar.{% endif %}
+                </p>
+            </div>
+            <div class="panel-actions">
+                <a href="{{ url_for('costo') }}" class="btn btn-ghost">Calcular el costo real de uno de estos</a>
+            </div>
+        </div>
+
+        <script>
+            new Chart(document.getElementById('compareChart'), {
+                type: 'bar',
+                data: { labels: ['Costo', 'Tiempo requerido', 'Apoyo/remuneración'],
+                    datasets: [
+                        { label: {{ sport1.name|tojson }}, data: [{{ sport1.cost_score or 3 }}, {{ sport1.time_score or 3 }}, {{ sport1.funding_score or 3 }}], backgroundColor:'#ffbe3d', borderRadius:3 },
+                        { label: {{ sport2.name|tojson }}, data: [{{ sport2.cost_score or 3 }}, {{ sport2.time_score or 3 }}, {{ sport2.funding_score or 3 }}], backgroundColor:'#5eb3ff', borderRadius:3 }
+                    ] },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#eef3fb'}}},
+                    scales:{ x:{ticks:{color:'#9fb0cc'},grid:{color:'#26385c'}}, y:{ticks:{color:'#9fb0cc'},grid:{color:'#26385c'},beginAtZero:true,max:5} } }
+            });
+        </script>
+    {% else %}
+        <div class="empty"><p>Elige dos deportes arriba para ver la comparación.</p></div>
+    {% endif %}
+{% endblock %}

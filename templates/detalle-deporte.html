@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ sport.name }} — SportsInfo{% endblock %}
+{% block content %}
+    <a href="{{ url_for('index') }}" class="back-link">← Volver</a>
+
+    <div class="panel-block">
+        {% if sport.image_url %}
+            <img src="{{ sport.image_url }}" alt="{{ sport.name }}" class="detail-img">
+        {% else %}
+            <div class="detail-img detail-img-placeholder">{{ icono_svg(sport.name, sport.category, 84)|safe }}</div>
+        {% endif %}
+
+        <div class="panel-cat">{{ sport.category }} · {{ sport.gender or 'Mixto' }}</div>
+        <h1 style="font-size:2rem;text-transform:none;letter-spacing:0;margin-top:8px;">{{ sport.name }}</h1>
+        {% if sport.description %}<p class="desc">{{ sport.description }}</p>{% endif %}
+
+        <div class="stat-grid">
+            <div class="stat-box"><div class="lbl">Costo aprox.</div><div class="val">{{ sport.average_cost or '—' }}</div></div>
+            <div class="stat-box"><div class="lbl">Tiempo/semana</div><div class="val">{{ sport.time_commitment or '—' }}</div></div>
+            <div class="stat-box"><div class="lbl">Dificultad</div><div class="val">{{ sport.difficulty_level or '—' }}</div></div>
+            <div class="stat-box"><div class="lbl">Género</div><div class="val">{{ sport.gender or 'Mixto' }}</div></div>
+        </div>
+
+        {% if sport.how_it_works %}<div class="info-block"><h4>Cómo funciona</h4><p>{{ sport.how_it_works }}</p></div>{% endif %}
+        {% if sport.equipment_required %}<div class="info-block"><h4>Equipamiento requerido</h4><p>{{ sport.equipment_required }}</p></div>{% endif %}
+        {% if sport.physical_benefits %}<div class="info-block"><h4>Beneficios físicos</h4><p>{{ sport.physical_benefits }}</p></div>{% endif %}
+        {% if sport.recommendations %}<div class="info-block"><h4>Recomendaciones</h4><p>{{ sport.recommendations }}</p></div>{% endif %}
+        {% if sport.diet_recommendations %}<div class="info-block"><h4>Dieta sugerida</h4><p>{{ sport.diet_recommendations }}</p></div>{% endif %}
+
+        <div class="panel-actions">
+            <a href="{{ url_for('entrenamiento') }}" class="btn btn-amber">Entrenar este deporte</a>
+            <a href="{{ url_for('costo') }}" class="btn btn-ghost">Calcular su costo</a>
+            <a href="{{ url_for('editar_deporte', sport_id=sport.id) }}" class="btn btn-ghost">Editar</a>
+            <form method="post" action="{{ url_for('eliminar_deporte', sport_id=sport.id) }}" onsubmit="return confirm('¿Seguro que quieres eliminar este deporte?');">
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

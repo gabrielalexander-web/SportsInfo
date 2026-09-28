@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Inicio — SportsInfo{% endblock %}
+{% block content %}
+    <div class="hero">
+        <h1>Tu próximo <em>deporte</em> te está esperando.</h1>
+        <p>Explora, compara y descubre qué disciplina se ajusta a ti — costo, tiempo, equipamiento y beneficios, todo antes de dar el primer paso. Y cuando crees tu perfil, te lo recomendamos nosotros.</p>
+        <div class="scorestrip">
+            <div class="score-tile"><div class="num mono">{{ sports|length }}</div><div class="lbl">deportes</div></div>
+            <div class="score-tile"><div class="num mono">{{ categories|length }}</div><div class="lbl">categorías</div></div>
+            <div class="score-tile"><div class="num mono">100%</div><div class="lbl">gratis de ver</div></div>
+        </div>
+        {% if not current_user %}
+            <div class="panel-actions" style="margin-top:20px;"><a href="{{ url_for('registro') }}" class="btn btn-amber">✨ Crear cuenta y recibir recomendaciones</a></div>
+        {% elif not (current_user.goal) %}
+            <div class="panel-actions" style="margin-top:20px;"><a href="{{ url_for('perfil') }}" class="btn btn-amber">✨ Completa tu perfil para recomendaciones personalizadas</a></div>
+        {% else %}
+            <div class="panel-actions" style="margin-top:20px;"><a href="{{ url_for('recomendacion') }}" class="btn btn-amber">✨ Ver mi recomendación personalizada</a></div>
+        {% endif %}
+    </div>
+
+    <div class="section-head" style="margin-top:8px;">
+        <div><h2 style="padding-left:0;">Deportes populares</h2><p>Elegidos por su popularidad — toca cualquiera para conocerlo a fondo.</p></div>
+        <a href="{{ url_for('agregar_deporte') }}" class="btn btn-amber">+ Agregar deporte</a>
+    </div>
+
+    <form class="filters" method="get" action="{{ url_for('index') }}">
+        <div class="search-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" name="q" placeholder="Buscar deporte..." value="{{ query_text }}">
+        </div>
+        <select name="categoria" onchange="this.form.submit()">
+            <option value="">Todas las categorías</option>
+            {% for cat in categories %}<option value="{{ cat }}" {% if cat==selected_category %}selected{% endif %}>{{ cat }}</option>{% endfor %}
+        </select>
+        <select name="genero" onchange="this.form.submit()">
+            <option value="">Cualquier género</option>
+            <option value="Masculino" {% if selected_gender=='Masculino' %}selected{% endif %}>Masculino</option>
+            <option value="Femenino" {% if selected_gender=='Femenino' %}selected{% endif %}>Femenino</option>
+            <option value="Mixto" {% if selected_gender=='Mixto' %}selected{% endif %}>Mixto</option>
+        </select>
+        <button type="submit" class="btn btn-amber">Buscar</button>
+    </form>
+
+    {% if sports %}
+        <div class="grid">
+            {% for sport in sports %}
+                <a class="card ficha-card" href="{{ url_for('detalle_deporte', sport_id=sport.id) }}">
+                    {% if sport.image_url %}
+                        <img src="{{ sport.image_url }}" alt="{{ sport.name }}" class="card-img">
+                    {% else %}
+                        <div class="card-img ficha-icon-wrap">{{ icono_svg(sport.name, sport.category, 46)|safe }}</div>
+                    {% endif %}
+                    <div class="cat">{{ sport.category }} · {{ sport.gender or 'Mixto' }}</div>
+                    <h3>{{ sport.name }}</h3>
+                    <p class="ficha-hook">{{ sport.description or 'Sin descripción todavía.' }}</p>
+                    <div class="ficha-chips">
+                        <span class="ficha-chip">💰 {{ sport.average_cost or '—' }}</span>
+                        <span class="ficha-chip">⏱️ {{ sport.time_commitment or '—' }}</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty"><p>No hay deportes que coincidan con tu búsqueda todavía.</p><a href="{{ url_for('agregar_deporte') }}" class="btn btn-amber">Agregar el primero</a></div>
+    {% endif %}
+
+    <div class="note"><b>Consejo:</b> crea una cuenta y completa tu perfil para comparar deportes a tu medida, recibir una recomendación personalizada, planificar tu entrenamiento y calcular tus calorías diarias.</div>
+{% endblock %}

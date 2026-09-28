@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Costo de practicar un deporte — SportsInfo{% endblock %}
+{% block content %}
+    <div class="section-head">
+        <div class="section-head-title">
+            <div class="section-icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 10h18M15 14h2.5"/></svg></div>
+            <div><h2>¿Cuánto cuesta practicar un deporte?</h2>
+            <p>Elige el deporte, el periodo y los gastos que apliquen — calculamos el costo mensual y total.</p>
+        </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel-block">
+            <form method="post">
+                <div class="field">
+                    <label>Deporte</label>
+                    <select name="sport_id" required>
+                        {% for s in sports %}
+                            <option value="{{ s.id }}" {% if selected_sport and selected_sport.id==s.id %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field"><label>Periodo (meses)</label><input type="number" name="months" min="1" max="60" value="{{ result.months if result else 1 }}" required></div>
+                <div class="field-row">
+                    <div class="field"><label>Inscripción (única vez)</label><input type="number" step="0.01" name="inscripcion" min="0" value="{{ result.detalle.inscripcion if result else 0 }}"></div>
+                    <div class="field"><label>Mensualidad</label><input type="number" step="0.01" name="mensualidad" min="0" value="{{ result.detalle.mensualidad if result else 0 }}"></div>
+                </div>
+                <div class="field-row">
+                    <div class="field"><label>Alquiler de instalaciones</label><input type="number" step="0.01" name="alquiler" min="0" value="{{ result.detalle.alquiler if result else 0 }}"></div>
+                    <div class="field"><label>Equipamiento (única vez)</label><input type="number" step="0.01" name="equipamiento" min="0" value="{{ result.detalle.equipamiento if result else 0 }}"></div>
+                </div>
+                <div class="field-row">
+                    <div class="field"><label>Vestimenta (única vez)</label><input type="number" step="0.01" name="vestimenta" min="0" value="{{ result.detalle.vestimenta if result else 0 }}"></div>
+                    <div class="field"><label>Transporte (mensual)</label><input type="number" step="0.01" name="transporte" min="0" value="{{ result.detalle.transporte if result else 0 }}"></div>
+                </div>
+                <div class="field"><label>Alimentación extra (mensual)</label><input type="number" step="0.01" name="alimentacion" min="0" value="{{ result.detalle.alimentacion if result else 0 }}"></div>
+                <button type="submit" class="btn btn-amber btn-block">Calcular costo</button>
+            </form>
+        </div>
+
+        <div class="panel-block">
+            {% if result %}
+                <h3 style="font-size:1.05rem;text-transform:none;letter-spacing:0;">Resultado{% if selected_sport %} para {{ selected_sport.name }}{% endif %}</h3>
+                <div class="stat-grid">
+                    <div class="stat-box"><div class="lbl">Costo mensual</div><div class="val">Bs {{ result.monthly_total }}</div></div>
+                    <div class="stat-box"><div class="lbl">Gasto único inicial</div><div class="val">Bs {{ result.unico }}</div></div>
+                    <div class="stat-box"><div class="lbl">Total del periodo ({{ result.months }} mes(es))</div><div class="val">Bs {{ result.period_total }}</div></div>
+                    <div class="stat-box"><div class="lbl">Costo mensual promedio</div><div class="val">Bs {{ result.mensual }}</div></div>
+                </div>
+                <table class="routine-table">
+                    <thead><tr><th>Gasto</th><th>Monto</th></tr></thead>
+                    <tbody>
+                        <tr><td>Inscripción (única vez)</td><td class="mono">Bs {{ result.detalle.inscripcion }}</td></tr>
+                        <tr><td>Mensualidad</td><td class="mono">Bs {{ result.detalle.mensualidad }}</td></tr>
+                        <tr><td>Alquiler de instalaciones</td><td class="mono">Bs {{ result.detalle.alquiler }}</td></tr>
+                        <tr><td>Equipamiento (única vez)</td><td class="mono">Bs {{ result.detalle.equipamiento }}</td></tr>
+                        <tr><td>Vestimenta (única vez)</td><td class="mono">Bs {{ result.detalle.vestimenta }}</td></tr>
+                        <tr><td>Transporte</td><td class="mono">Bs {{ result.detalle.transporte }}</td></tr>
+                        <tr><td>Alimentación extra</td><td class="mono">Bs {{ result.detalle.alimentacion }}</td></tr>
+                    </tbody>
+                </table>
+                <div class="chart-box"><canvas id="costChart"></canvas></div>
+                <script>
+                    new Chart(document.getElementById('costChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Inscripción','Mensualidad','Alquiler','Equipamiento','Vestimenta','Transporte','Alimentación'],
+                            datasets: [{ data: [{{ result.detalle.inscripcion }},{{ result.detalle.mensualidad }},{{ result.detalle.alquiler }},{{ result.detalle.equipamiento }},{{ result.detalle.vestimenta }},{{ result.detalle.transporte }},{{ result.detalle.alimentacion }}],
+                                backgroundColor:['#ffbe3d','#4fd48c','#5eb3ff','#ff6b6b','#c084fc','#f472b6','#facc15'], borderColor:'#0f1e35', borderWidth:2 }]
+                        },
+                        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#eef3fb', boxWidth:12, font:{size:10}}}} }
+                    });
+                </script>
+            {% else %}
+                <h3 style="font-size:1.05rem;text-transform:none;letter-spacing:0;">Resultado</h3>
+                <p style="color:var(--ink-dim);font-size:0.9rem;margin-top:8px;">Completa el formulario para ver el desglose de costos.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

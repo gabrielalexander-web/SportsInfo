@@ -1,0 +1,39 @@
+<div class="field"><label>Nombre *</label><input type="text" name="name" value="{{ sport.name or '' }}" required></div>
+
+<div class="field-row">
+    <div class="field">
+        <label>Categoría</label>
+        <input type="text" name="category" value="{{ sport.category or '' }}" placeholder="Equipo, Individual, Acuático, Combate...">
+    </div>
+    <div class="field">
+        <label>Género</label>
+        <select name="gender">
+            {% for g in ["Mixto", "Masculino", "Femenino"] %}<option value="{{ g }}" {% if sport.gender==g %}selected{% endif %}>{{ g }}</option>{% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="field"><label>Breve descripción</label><textarea name="description" rows="2">{{ sport.description or '' }}</textarea></div>
+<div class="field"><label>Cómo funciona el deporte</label><textarea name="how_it_works" rows="3">{{ sport.how_it_works or '' }}</textarea></div>
+
+<div class="field-row">
+    <div class="field"><label>Costo aproximado (texto)</label><input type="text" name="average_cost" value="{{ sport.average_cost or '' }}" placeholder="Ej. Bajo (~$50)"></div>
+    <div class="field"><label>Costo (1=bajo, 5=alto)</label><input type="number" name="cost_score" min="1" max="5" value="{{ sport.cost_score or 3 }}"></div>
+</div>
+<div class="field-row">
+    <div class="field"><label>Tiempo de juego/entrenamiento (texto)</label><input type="text" name="time_commitment" value="{{ sport.time_commitment or '' }}" placeholder="Ej. 3-5 h/semana"></div>
+    <div class="field"><label>Tiempo requerido (1=poco, 5=mucho)</label><input type="number" name="time_score" min="1" max="5" value="{{ sport.time_score or 3 }}"></div>
+</div>
+<div class="field"><label>Apoyo/remuneración estimada (1=poco, 5=mucho)</label><input type="number" name="funding_score" min="1" max="5" value="{{ sport.funding_score or 3 }}"></div>
+
+<div class="field"><label>Equipamiento requerido</label><textarea name="equipment_required" rows="2" placeholder="Ej. Botines, espinilleras, balón propio...">{{ sport.equipment_required or '' }}</textarea></div>
+<div class="field"><label>Beneficios físicos</label><textarea name="physical_benefits" rows="2" placeholder="Ej. Mejora resistencia cardiovascular, fuerza en piernas...">{{ sport.physical_benefits or '' }}</textarea></div>
+
+<div class="field">
+    <label>Dificultad</label>
+    <select name="difficulty_level">{% for nivel in ["Principiante", "Intermedio", "Avanzado"] %}<option value="{{ nivel }}" {% if sport.difficulty_level==nivel %}selected{% endif %}>{{ nivel }}</option>{% endfor %}</select>
+</div>
+
+<div class="field"><label>Recomendaciones</label><textarea name="recommendations" rows="2">{{ sport.recommendations or '' }}</textarea></div>
+<div class="field"><label>Dieta sugerida</label><textarea name="diet_recommendations" rows="2">{{ sport.diet_recommendations or '' }}</textarea></div>
+<div class="field"><label>URL de imagen (opcional)</label><input type="url" name="image_url" value="{{ sport.image_url or '' }}" placeholder="https://..."></div>

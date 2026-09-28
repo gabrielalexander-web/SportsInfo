@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Calculadora de calorías — SportsInfo{% endblock %}
+{% block content %}
+    <div class="section-head">
+        <div class="section-head-title">
+            <div class="section-icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c0-2-1-3-1-5 2 1 3 3 3 6a5 5 0 01-10 0c0-5 3-6 5-10z"/></svg></div>
+            <div><h2>Calculadora de calorías</h2>
+            <p>Elige tu nivel deportivo para calcular tu límite diario, y ve registrando lo que comes para saber si sigues dentro de ese límite.</p>
+        </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel-block">
+            <h3 style="font-size:1rem;text-transform:none;letter-spacing:0;margin-bottom:14px;">1. Tu límite diario</h3>
+            <form method="post">
+                <input type="hidden" name="accion" value="calcular_perfil">
+                <div class="field-row">
+                    <div class="field"><label>Edad</label><input type="number" name="age" min="10" max="100" required></div>
+                    <div class="field"><label>Sexo</label><select name="sex" required><option>Masculino</option><option>Femenino</option></select></div>
+                </div>
+                <div class="field-row">
+                    <div class="field"><label>Peso (kg)</label><input type="number" step="0.1" name="weight" min="20" max="300" required></div>
+                    <div class="field"><label>Estatura (cm)</label><input type="number" name="height" min="100" max="230" required></div>
+                </div>
+                <div class="field">
+                    <label>Nivel deportivo</label>
+                    <select name="nivel" required>
+                        {% for nombre, info in niveles.items() %}<option value="{{ nombre }}">{{ nombre }} — {{ info.descripcion }}</option>{% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-amber btn-block">Calcular mi límite diario</button>
+            </form>
+
+            {% if perfil_calorico %}
+                <div class="stat-grid">
+                    <div class="stat-box"><div class="lbl">Metabolismo basal</div><div class="val">{{ perfil_calorico.tmb }} kcal</div></div>
+                    <div class="stat-box"><div class="lbl">Límite diario ({{ perfil_calorico.nivel }})</div><div class="val">{{ perfil_calorico.limite_diario }} kcal</div></div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="panel-block">
+            <h3 style="font-size:1rem;text-transform:none;letter-spacing:0;margin-bottom:14px;">2. ¿Qué comiste hoy?</h3>
+
+            {% if not perfil_calorico %}
+                <p style="color:var(--ink-dim);font-size:0.9rem;">Primero calcula tu límite diario a la izquierda.</p>
+            {% else %}
+                <form method="post" class="field-row" style="align-items:end;">
+                    <input type="hidden" name="accion" value="agregar_alimento">
+                    <div class="field"><label>Alimento</label><input type="text" name="nombre_alimento" placeholder="Ej. Pollo a la plancha" required></div>
+                    <div class="field"><label>Calorías (kcal)</label><input type="number" name="kcal_alimento" min="0" required></div>
+                    <div class="field" style="grid-column:1/-1;"><button type="submit" class="btn btn-amber btn-block">+ Agregar alimento</button></div>
+                </form>
+
+                {% if alimentos %}
+                    <table class="routine-table">
+                        <thead><tr><th>Alimento</th><th>kcal</th></tr></thead>
+                        <tbody>{% for a in alimentos %}<tr><td>{{ a.nombre }}</td><td class="mono">{{ a.kcal }}</td></tr>{% endfor %}</tbody>
+                    </table>
+
+                    <div class="progress-wrap">
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill progress-{{ resumen.estado.clave }}" style="width:{{ [resumen.porcentaje, 100]|min }}%;"></div>
+                        </div>
+                        <div class="progress-label">{{ resumen.porcentaje }}% de tu límite diario</div>
+                    </div>
+
+                    <div class="calorie-status calorie-status-{{ resumen.estado.clave }}">{{ resumen.estado.mensaje }}</div>
+
+                    <div class="stat-grid">
+                        <div class="stat-box"><div class="lbl">Consumido hoy</div><div class="val">{{ resumen.total_consumido }} kcal</div></div>
+                        <div class="stat-box"><div class="lbl">{{ 'Te queda' if resumen.restante >= 0 else 'Excediste por' }}</div><div class="val">{{ resumen.restante if resumen.restante >= 0 else -resumen.restante }} kcal</div></div>
+                    </div>
+
+                    <form method="post" style="margin-top:14px;">
+                        <input type="hidden" name="accion" value="reiniciar_dia">
+                        <button type="submit" class="btn btn-ghost btn-block">Reiniciar registro del día</button>
+                    </form>
+                {% else %}
+                    <p style="color:var(--ink-dim);font-size:0.88rem;margin-top:12px;">Todavía no agregaste ningún alimento hoy.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="note"><b>Estimación general</b> (fórmula de Mifflin-St Jeor + tu nivel deportivo), no un plan médico ni nutricional personalizado. Las calorías de cada alimento las ingresas tú mismo — para tu ejemplo, esto es exactamente lo que hace: sumas el pollo, las papas y todo lo demás, y te dice si sigues dentro de tu límite.</div>
+{% endblock %}

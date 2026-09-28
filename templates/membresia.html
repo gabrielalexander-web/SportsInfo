@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Membresía — SportsInfo{% endblock %}
+{% block content %}
+    <div class="section-head">
+        <div>
+            <h2>Membresía <span class="soon">Próximamente</span></h2>
+            <p>Así se vería la membresía de SportsInfo. Los precios son referenciales — todavía no hay cobros reales conectados.</p>
+        </div>
+    </div>
+    <div class="plans">
+        <div class="plan-card">
+            <div class="plan-name">Gratis</div>
+            <div class="plan-price">Bs 0<span>/mes</span></div>
+            <ul class="plan-feats">
+                <li>Catálogo completo de deportes</li>
+                <li>1 rutina de entrenamiento activa</li>
+                <li>Historial de las últimas 3 entradas</li>
+            </ul>
+            <button class="btn btn-ghost btn-block" disabled>Plan actual</button>
+        </div>
+        <div class="plan-card highlight">
+            <div class="plan-name">Básico</div>
+            <div class="plan-price">Bs 25<span>/mes</span></div>
+            <ul class="plan-feats">
+                <li>Todo lo del plan Gratis</li>
+                <li>Rutinas ilimitadas por deporte</li>
+                <li>Historial y estadísticas completas</li>
+                <li>Cámara de calorías (10 análisis/mes)</li>
+            </ul>
+            <button class="btn btn-amber btn-block" disabled>Próximamente</button>
+        </div>
+        <div class="plan-card">
+            <div class="plan-name">Premium</div>
+            <div class="plan-price">Bs 49<span>/mes</span></div>
+            <ul class="plan-feats">
+                <li>Todo lo del plan Básico</li>
+                <li>Cámara de calorías ilimitada</li>
+                <li>Recomendaciones personalizadas por IA</li>
+                <li>Soporte prioritario</li>
+            </ul>
+            <button class="btn btn-ghost btn-block" disabled>Próximamente</button>
+        </div>
+    </div>
+{% endblock %}
