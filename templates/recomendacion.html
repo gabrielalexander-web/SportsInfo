@@ -1,35 +1,82 @@
 {% extends "base.html" %}
 {% block title %}Recomendación personalizada — SportsInfo{% endblock %}
-{% block content %}
-    <div class="section-head">
-        <div class="section-head-title">
-            <div class="section-icon-badge"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.6L19 10l-5.2 1.4L12 17l-1.8-5.6L5 10l5.2-1.4z"/></svg></div>
-            <div><h2>Tu recomendación personalizada</h2>
-            <p>Según tu edad, sexo, experiencia, presupuesto, tiempo libre y objetivo (<b>{{ user.goal }}</b>), estos son los deportes que mejor encajan contigo.</p>
+{% block content %} <div class="section-head"> <div class="section-head-title"> <div class="section-icon-badge"> <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                  stroke="var(--amber)" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"> <path d="M12 3l1.8 5.6L19 10l-5.2 1.4L12 17l-1.8-5.6L5 10l5.2-1.4z"/> </svg> </div>
+
+```
+        <div>
+            <h2>Tu recomendación personalizada</h2>
+            <p>
+                Según tu edad, sexo, experiencia, presupuesto, tiempo libre y objetivo
+                (<b>{{ user.goal }}</b>), estos son los deportes que mejor encajan contigo.
+            </p>
         </div>
-        </div>
-        <a href="{{ url_for('perfil') }}" class="btn btn-ghost">Editar mi perfil</a>
     </div>
 
-    {% if resultados %}
-        <div class="grid">
-            {% for r in resultados %}
-                <a class="card" href="{{ url_for('detalle_deporte', sport_id=r.sport.id) }}" style="{% if loop.first %}border-color:var(--amber);{% endif %}">
-                    <div class="card-img ficha-icon-wrap">{{ icono_svg(r.sport.name, r.sport.category, 46)|safe }}</div>
-                    {% if loop.first %}<div class="soon" style="border-color:var(--turf);color:var(--turf);margin-left:0;margin-bottom:8px;display:inline-block;">Mejor opción</div>{% endif %}
-                    <div class="cat">{{ r.sport.category }} · {{ r.sport.gender or 'Mixto' }}</div>
-                    <h3>{{ r.sport.name }}</h3>
-                    <div class="desc">{{ r.sport.description or '' }}</div>
-                    <div class="info-block" style="margin-top:8px;">
-                        <h4>Por qué te lo recomendamos</h4>
-                        <p>{{ r.motivos|join(', ')|capitalize }}.</p>
+    <a href="{{ url_for('perfil') }}" class="btn btn-ghost">Editar mi perfil</a>
+</div>
+
+{% if resultados %}
+    <div class="grid">
+        {% for r in resultados %}
+            <a class="card"
+               href="{{ url_for('detalle_deporte', sport_id=r.sport.id) }}"
+               style="{% if loop.first %}border-color:var(--amber);{% endif %}">
+
+                <div class="card-img ficha-icon-wrap">
+                    {% if r.sport.image_url %}
+                        <img src="{{ r.sport.image_url }}"
+                             alt="{{ r.sport.name }}"
+                             style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                    {% else %}
+                        {{ icono_svg(r.sport.name, r.sport.category, 46)|safe }}
+                    {% endif %}
+                </div>
+
+                {% if loop.first %}
+                    <div class="soon"
+                         style="border-color:var(--turf);color:var(--turf);margin-left:0;margin-bottom:8px;display:inline-block;">
+                        Mejor opción
                     </div>
-                    <div class="row"><span>Compatibilidad</span><span class="v">{{ r.score }}/19</span></div>
-                </a>
-            {% endfor %}
-        </div>
-        <div class="note"><b>Cómo se calcula:</b> comparamos tu presupuesto y tiempo libre contra el costo y la exigencia de cada deporte, tu experiencia contra su dificultad, y tu objetivo contra sus beneficios físicos. No es una decisión médica ni definitiva — es un punto de partida.</div>
-    {% else %}
-        <div class="empty"><p>Todavía no hay deportes suficientes en el catálogo para generar una recomendación.</p></div>
-    {% endif %}
+                {% endif %}
+
+                <div class="cat">
+                    {{ r.sport.category }} · {{ r.sport.gender or 'Mixto' }}
+                </div>
+
+                <h3>{{ r.sport.name }}</h3>
+
+                <div class="desc">
+                    {{ r.sport.description or '' }}
+                </div>
+
+                <div class="info-block" style="margin-top:8px;">
+                    <h4>Por qué te lo recomendamos</h4>
+                    <p>{{ r.motivos|join(', ')|capitalize }}.</p>
+                </div>
+
+                <div class="row">
+                    <span>Compatibilidad</span>
+                    <span class="v">{{ r.score }}/19</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="note">
+        <b>Cómo se calcula:</b>
+        comparamos tu presupuesto y tiempo libre contra el costo y la exigencia
+        de cada deporte, tu experiencia contra su dificultad, y tu objetivo contra
+        sus beneficios físicos. No es una decisión médica ni definitiva — es un
+        punto de partida.
+    </div>
+{% else %}
+    <div class="empty">
+        <p>Todavía no hay deportes suficientes en el catálogo para generar una recomendación.</p>
+    </div>
+{% endif %}
+```
+
 {% endblock %}
+

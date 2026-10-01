@@ -288,7 +288,7 @@ def perfil():
         datos = {
             "age": int(request.form.get("age") or 0) or None,
             "weight": float(request.form.get("weight") or 0) or None,
-            "height": float(request.form.get("height") or 0) or None,
+            "height": round(float(request.form.get("height") or 0) * 100, 1) or None,
             "sex": request.form.get("sex", "").strip(),
             "experience_level": request.form.get("experience_level", "").strip(),
             "goal": request.form.get("goal", "").strip(),
